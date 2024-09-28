@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .center {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .misleading-button {
+            background-color: #f00;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            font-size: 18px;
+        }
+        .step {
+            margin: 20px;
+            border: 2px dashed #888;
+            padding: 20px;
+            display: none;
+        }
+        #captcha {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        #spinner {
+            display: none;
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <h1>Delete Your Account</h1>
+        <p>We're sad to see you go! Please proceed below.</p>
+
+        <!-- Step 1: Confirmation Misleading Button -->
+        <button class="misleading-button" onclick="proceedStep(1)">Click here to keep your account</button>
+
+        <!-- Step 2: Misdirection -->
+        <div id="step1" class="step">
+            <h2>Are You Sure?</h2>
+            <p>You really want to delete? If yes, answer the security question!</p>
+            <label>What's the name of your first pet? (trick question, it's not required)</label>
+            <input type="text" id="petName"><br><br>
+            <button onclick="proceedStep(2)">Submit Answer</button>
+        </div>
+
+        <!-- Step 3: Fake Captcha -->
+        <div id="step2" class="step">
+            <h2>Almost There! Prove You're Not a Robot</h2>
+            <div id="captcha">Type the color of the sky below</div>
+            <input type="text" id="captchaInput" placeholder="Enter your answer"><br><br>
+            <button onclick="checkCaptcha()">Submit</button>
+            <div id="captchaError" class="warning"></div>
+        </div>
+
+        <!-- Step 4: Spinner and Timeout -->
+        <div id="step3" class="step">
+            <h2>Final Step: We're Processing</h2>
+            <p>Please wait while we confirm your request...</p>
+            <img src="spinner.gif" id="spinner" alt="Processing">
+            <p>This may take a few moments, please be patient.</p>
+        </div>
+
+        <!-- Step 5: More Steps After 5 Spinner Loops -->
+        <div id="step4" class="step">
+            <h2>New Step: Verify Your Email</h2>
+            <p>Please verify your email by entering the code we just sent (we didn't actually send it).</p>
+            <input type="text" id="emailCode" placeholder="Enter the code"><br><br>
+            <button onclick="checkEmailCode()">Submit Code</button>
+            <div id="emailError" class="warning"></div>
+        </div>
+
+        <div id="step5" class="step">
+            <h2>New Step: Fill Out This Survey</h2>
+            <p>Before deleting, please fill out this required survey.</p>
+            <label>Why are you leaving?</label><br>
+            <textarea id="surveyReason" rows="4" cols="50"></textarea><br><br>
+            <button onclick="submitSurvey()">Submit Survey</button>
+        </div>
+
+        <div id="step6" class="step">
+            <h2>One Last Step!</h2>
+            <p>Confirm one more time: Do you *really* want to delete your account?</p>
+            <button onclick="finalDelete()">Yes, delete my account</button>
+            <button onclick="window.location.reload()">No, I changed my mind</button>
+        </div>
+    </div>
+
+    <script>
+        let spinnerCount = 0;
+
+        function proceedStep(step) {
+            if (step === 1) {
+                document.querySelector('.misleading-button').textContent = "Oops! We meant to say delete!";
+                document.querySelector('.misleading-button').onclick = function () {
+                    document.getElementById('step1').style.display = 'block';
+                };
+            } else if (step === 2) {
+                const petName = document.getElementById('petName').value;
+                if (petName.trim() === "") {
+                    alert("Incorrect! Please provide a valid pet name.");
+                } else {
+                    document.getElementById('step1').style.display = 'none';
+                    document.getElementById('step2').style.display = 'block';
+                }
+            }
+        }
+
+        function checkCaptcha() {
+            const answer = document.getElementById('captchaInput').value.toLowerCase();
+            if (answer !== 'blue') {
+                document.getElementById('captchaError').textContent = "Incorrect! Try again.";
+            } else {
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step3').style.display = 'block';
+                document.getElementById('spinner').style.display = 'block';
+                spinnerCount++;
+                
+                if (spinnerCount < 5) {
+                    setTimeout(function () {
+                        alert("Something went wrong, please try again later.");
+                        document.getElementById('spinner').style.display = 'none';
+                        document.getElementById('step3').style.display = 'none';
+                        document.getElementById('step2').style.display = 'block';
+                    }, 5000);
+                } else {
+                    setTimeout(function () {
+                        document.getElementById('spinner').style.display = 'none';
+                        document.getElementById('step3').style.display = 'none';
+                        document.getElementById('step4').style.display = 'block';
+                    }, 5000);
+                }
+            }
+        }
+
+        function checkEmailCode() {
+            const emailCode = document.getElementById('emailCode').value;
+            if (emailCode !== "1234") {
+                document.getElementById('emailError').textContent = "Incorrect code. Please try again.";
+            } else {
+                document.getElementById('step4').style.display = 'none';
+                document.getElementById('step5').style.display = 'block';
+            }
+        }
+
+        function submitSurvey() {
+            const reason = document.getElementById('surveyReason').value;
+            if (reason.trim() === "") {
+                alert("Please fill out the survey!");
+            } else {
+                document.getElementById('step5').style.display = 'none';
+                document.getElementById('step6').style.display = 'block';
+            }
+        }
+
+        function finalDelete() {
+            alert("Account deleted! (Just kidding, start over!)");
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
